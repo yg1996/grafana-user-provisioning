@@ -15,16 +15,18 @@ This repository contains two Grafana user provisioning setups using Helm:
 ### Steps
 1. Apply the ConfigMap and Secret:
    - Run the following commands:
+     ```bash
      kubectl apply -f 3_users_deployment/provisioning/configmap.yaml
      kubectl apply -f 3_users_deployment/provisioning/secret.yaml
-
+     ```
 2. Deploy Grafana using the Helm values file:
    - Run the following command:
+     ```bash
      helm install grafana grafana/grafana \
        --namespace grafana \
        --create-namespace \
        --values 3_users_deployment/values.yaml
-
+     ```
 ---
 
 ## **50 Users Deployment**
@@ -36,25 +38,29 @@ This repository contains two Grafana user provisioning setups using Helm:
 ### Steps
 1. Apply the ConfigMaps and Secret:
    - Run the following commands:
+     ```bash
      kubectl apply -f 50_users_deployment/provisioning/configmap-users.yaml
      kubectl apply -f 50_users_deployment/provisioning/configmap-script.yaml
      kubectl apply -f 50_users_deployment/provisioning/secret.yaml
+     ```
 
 2. Deploy Grafana using the Helm values file:
    - Run the following command:
+     ```bash
      helm install grafana grafana/grafana \
        --namespace grafana \
        --create-namespace \
        --values 50_users_deployment/values.yaml
-
+     ```
 ---
 
 ## Cleanup
 
 To remove resources, delete the namespace:
 - Run the following command:
+  ```bash
   kubectl delete namespace grafana
-
+  ```
 ---
 
 ## Security Considerations
