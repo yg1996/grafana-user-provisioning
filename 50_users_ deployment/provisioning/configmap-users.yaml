@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-user-list
+data:
+  users.json: |
+    [
+      {"name": "user1", "email": "user1@example.com", "login": "user1", "password_secret_key": "user1-password", "role": "Viewer"},
+      {"name": "user2", "email": "user2@example.com", "login": "user2", "password_secret_key": "user2-password", "role": "Editor"},
+      {"name": "user3", "email": "user3@example.com", "login": "user3", "password_secret_key": "user3-password", "role": "Admin"}
+      // Add more users here, up to 50
+    ]

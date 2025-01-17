@@ -19,8 +19,13 @@ grafana:
     - name: grafana-secrets
       secret:
         secretName: grafana-admin-credentials
+    - name: user-passwords
+      secret:
+        secretName: grafana-user-passwords
   extraVolumeMounts:
     - name: provisioning-script
       mountPath: /provision
     - name: grafana-secrets
+      mountPath: /secrets
+    - name: user-passwords
       mountPath: /secrets

@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-user-provisioning-script
+data:
+  provision-users.sh: |
+    #!/bin/bash
+
+    GRAFANA_URL="http://localhost:3000"
+    ADMIN_USER=$(cat /secrets/admin-username)
+    ADMIN_PASSWORD=$(cat /secrets/admin-password)
+
+    USER_FILE="/provision/users.json"
+
+    jq -c '.[]' $USER_FILE | while read USER; do
+      NAME=$(echo $USER | jq -r '.name')
+      EMAIL=$(echo $USER | jq -r '.email')
+      LOGIN=$(echo $USER | jq -r '.login')
+      ROLE=$(echo $USER | jq -r '.role')
+      PASSWORD_SECRET_KEY=$(echo $USER | jq -r '.password_secret_key')
+
+      PASSWORD=$(cat /secrets/$PASSWORD_SECRET_KEY)
+
+      curl -u "$ADMIN_USER:$ADMIN_PASSWORD" -X POST "$GRAFANA_URL/api/admin/users" \
+        -H "Content-Type: application/json" \
+        -d "{\"name\":\"$NAME\",\"email\":\"$EMAIL\",\"login\":\"$LOGIN\",\"password\":\"$PASSWORD\",\"role\":\"$ROLE\"}"
+    done

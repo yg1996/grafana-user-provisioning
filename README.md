@@ -1,36 +1,63 @@
-# Grafana User Provisioning During Helm Chart Installation
+# Grafana User Provisioning
 
-This setup provisions users during the initial deployment of Grafana using the official Helm Chart. It utilizes `extraInitContainers` to run a script that creates users and assigns roles.
+This repository contains two Grafana user provisioning setups using Helm:
+1. **3 Users Deployment**: A simple setup for provisioning three hardcoded users.
+2. **50 Users Deployment**: A dynamic setup for provisioning up to 50 users from a ConfigMap.
 
-## Project Structure
-- `values.yaml`: Custom Helm values to integrate user provisioning.
-- `provisioning/configmap.yaml`: Contains the script to provision users.
-- `provisioning/secret.yaml`: Stores admin credentials securely.
+---
 
-## Prerequisites
-- Kubernetes cluster with Helm installed.
-- Access to the Grafana Helm Chart repository.
+## **3 Users Deployment**
 
-## Deployment Steps
+### Overview
+- Hardcoded users are stored in the provisioning script within the ConfigMap.
+- Admin credentials and user passwords are stored in a Kubernetes Secret.
 
-1. **Clone the Repository**
-   ```bash
-   git clone https://github.com/yg1996/grafana-user-provisioning.git
-   cd grafana-user-provisioning
-   ```
-2. **Apply ConfigMap and Secret**
-   ```bash
-   kubectl apply -f provisioning/configmap.yaml
-   kubectl apply -f provisioning/secret.yaml
-   ```
-3. **Deploy Grafana with Custom Values Use the values.yaml file during the Helm Chart installation:**
-   ```bash
-   helm repo add grafana https://grafana.github.io/helm-charts
-   helm install grafana grafana/grafana \
-    --namespace grafana \
-    --create-namespace \
-    --values values.yaml
-   ```
-2. **Verify User Creation**
-   * Log in to Grafana using the admin credentials.
-   * Navigate to Configuration > Users to confirm the Viewer, Editor, and Admin users are created.
+### Steps
+1. Apply the ConfigMap and Secret:
+   - Run the following commands:
+     kubectl apply -f 3_users_deployment/provisioning/configmap.yaml
+     kubectl apply -f 3_users_deployment/provisioning/secret.yaml
+
+2. Deploy Grafana using the Helm values file:
+   - Run the following command:
+     helm install grafana grafana/grafana \
+       --namespace grafana \
+       --create-namespace \
+       --values 3_users_deployment/values.yaml
+
+---
+
+## **50 Users Deployment**
+
+### Overview
+- User list is stored in a `users.json` format within the `configmap-users.yaml`.
+- Passwords are stored in a Kubernetes Secret and referenced dynamically.
+
+### Steps
+1. Apply the ConfigMaps and Secret:
+   - Run the following commands:
+     kubectl apply -f 50_users_deployment/provisioning/configmap-users.yaml
+     kubectl apply -f 50_users_deployment/provisioning/configmap-script.yaml
+     kubectl apply -f 50_users_deployment/provisioning/secret.yaml
+
+2. Deploy Grafana using the Helm values file:
+   - Run the following command:
+     helm install grafana grafana/grafana \
+       --namespace grafana \
+       --create-namespace \
+       --values 50_users_deployment/values.yaml
+
+---
+
+## Cleanup
+
+To remove resources, delete the namespace:
+- Run the following command:
+  kubectl delete namespace grafana
+
+---
+
+## Security Considerations
+- All sensitive information (admin credentials and passwords) is stored in Kubernetes Secrets.
+- RBAC policies should restrict access to Secrets.
+- Ensure Secrets are encrypted at rest and rotated periodically.

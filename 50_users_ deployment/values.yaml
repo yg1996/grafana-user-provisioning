@@ -1,0 +1,32 @@
+grafana:
+  admin:
+    existingSecret: grafana-admin-credentials
+
+  extraInitContainers:
+    - name: user-provisioning
+      image: curlimages/curl:latest
+      command: ["/bin/sh", "/provision/provision-users.sh"]
+      volumeMounts:
+        - name: provisioning-script
+          mountPath: /provision
+        - name: user-list
+          mountPath: /provision
+        - name: user-passwords
+          mountPath: /secrets
+  extraVolumes:
+    - name: provisioning-script
+      configMap:
+        name: grafana-user-provisioning-script
+    - name: user-list
+      configMap:
+        name: grafana-user-list
+    - name: user-passwords
+      secret:
+        secretName: grafana-user-passwords
+  extraVolumeMounts:
+    - name: provisioning-script
+      mountPath: /provision
+    - name: user-list
+      mountPath: /provision
+    - name: user-passwords
+      mountPath: /secrets
