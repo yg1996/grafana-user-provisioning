@@ -1,0 +1,26 @@
+grafana:
+  admin:
+    existingSecret: grafana-admin-credentials
+
+  # Add an init container for user provisioning
+  extraInitContainers:
+    - name: user-provisioning
+      image: curlimages/curl:latest
+      command: ["/bin/sh", "/provision/provision-users.sh"]
+      volumeMounts:
+        - name: provisioning-script
+          mountPath: /provision
+        - name: grafana-secrets
+          mountPath: /secrets
+  extraVolumes:
+    - name: provisioning-script
+      configMap:
+        name: grafana-user-provisioning-script
+    - name: grafana-secrets
+      secret:
+        secretName: grafana-admin-credentials
+  extraVolumeMounts:
+    - name: provisioning-script
+      mountPath: /provision
+    - name: grafana-secrets
+      mountPath: /secrets
